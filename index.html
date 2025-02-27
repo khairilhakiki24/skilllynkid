@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Keterampilan</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .skill-container {
+            margin-bottom: 20px;
+        }
+        .progress-bar-container {
+            background-color: #E0E0E0;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 20px;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            background-color: #2DB47D;
+            height: 100%;
+        }
+        .percentage-text {
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Generator Keterampilan</h1>
+        <form id="skillForm">
+            <div id="skillInputs">
+                <div class="form-group">
+                    <label for="skillName">Nama Keterampilan:</label>
+                    <input type="text" class="form-control" name="skillName[]" placeholder="Masukkan Nama Keterampilan" required>
+                </div>
+                <div class="form-group">
+                    <label for="skillPercentage">Persentase (%):</label>
+                    <input type="number" class="form-control" name="skillPercentage[]" placeholder="Masukkan Persentase" min="0" max="100" required>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addSkillInput()">Tambah Keterampilan</button>
+            <button type="button" class="btn btn-success" onclick="generateHTML()">Generate HTML</button>
+        </form>
+        <pre id="output" class="mt-4" style="background-color: #f4f4f4; padding: 10px; border-radius: 5px;"></pre>
+    </div>
+
+    <script>
+        function addSkillInput() {
+            const skillInputs = document.getElementById('skillInputs');
+            const newInput = document.createElement('div');
+            newInput.innerHTML = `
+                <div class="form-group">
+                    <label for="skillName">Nama Keterampilan:</label>
+                    <input type="text" class="form-control" name="skillName[]" placeholder="Masukkan Nama Keterampilan" required>
+                </div>
+                <div class="form-group">
+                    <label for="skillPercentage">Persentase (%):</label>
+                    <input type="number" class="form-control" name="skillPercentage[]" placeholder="Masukkan Persentase" min="0" max="100" required>
+                </div>
+            `;
+            skillInputs.appendChild(newInput);
+        }
+
+        function generateHTML() {
+            const form = document.getElementById('skillForm');
+            const formData = new FormData(form);
+            const skillNames = formData.getAll('skillName[]');
+            const skillPercentages = formData.getAll('skillPercentage[]');
+
+            let html = `<h2 style="font-size: 24px; margin-bottom: 20px;">Keterampilan</h2>\n`;
+
+            for (let i = 0; i < skillNames.length; i++) {
+                const skillName = skillNames[i].trim();
+                const skillPercentage = parseInt(skillPercentages[i], 10);
+
+                // Validate input
+                if (!skillName || isNaN(skillPercentage) || skillPercentage < 0 || skillPercentage > 100) {
+                    alert(`Input tidak valid untuk keterampilan ke-${i + 1}. Pastikan nama keterampilan tidak kosong dan persentase antara 0-100.`);
+                    return;
+                }
+
+                html += `<div class="skill-container">\n`;
+                html += `    <p style="font-weight: bold;">${skillName}</p>\n`;
+                html += `    <div style="background-color: #E0E0E0; border-radius: 8px; overflow: hidden;">\n`;
+                html += `        <div style="width: ${skillPercentage}%; background-color: #2DB47D; height: 20px;"></div>\n`;
+                html += `    </div>\n`;
+                html += `    <p class="percentage-text">${skillPercentage}%</p>\n`;
+                html += `</div>\n`;
+            }
+
+            // Salin hasil ke clipboard
+            navigator.clipboard.writeText(html).then(() => {
+                alert('HTML telah disalin ke clipboard!');
+            }, (err) => {
+                console.error('Gagal menyalin: ', err);
+            });
+
+            document.getElementById('output').textContent = html;
+        }
+    </script>
+</body>
+</html>
